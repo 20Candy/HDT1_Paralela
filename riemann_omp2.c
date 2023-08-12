@@ -43,17 +43,18 @@ double trapezoides(double a, double b, int n, double (*func)(double)) {
 // Funcion principal
 int main(int argc, char* argv[]) {
 
-    // Verificamos que se haya proporcionado la cantidad correcta de argumentos
-    if (argc != 4) {
-        printf("Uso: %s a b threads\n", argv[0]);
-        return 1;
-    }
+    // Parametros por defecto
+    double a = 2.0; 
+    double b = 10.0; 
+    int threads = 4;
+    int n = 10000000; // Valor por defecto para n 
 
-    double a = atof(argv[1]);
-    double b = atof(argv[2]);
-    int threads = atoi(argv[3]);
-    
-    int n = 1000000; // Valor por defecto para n 
+    // Si se ingresan parametros, se toman esos valores
+    if (argc > 3) {
+        a = atof(argv[1]);
+        b = atof(argv[2]);
+        threads = atoi(argv[3]); 
+    }
 
     // Realizar los cálculos necesarios para distribuir el trabajo entre los threads
     double h = (b - a) / n;
