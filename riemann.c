@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
     // Parametros por defecto
     double a = 2.0; 
     double b = 10.0; 
-    int n = 1000000;
+    int n = 4;
 
     // Si se ingresan parametros, se toman esos valores
     if (argc > 1) {

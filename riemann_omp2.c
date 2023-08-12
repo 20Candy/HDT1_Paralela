@@ -1,15 +1,18 @@
 /*
 Autor: Carol Arevalo
-Para compilar: gcc -o riemann riemann.c -lm
+Para compilar: gcc -o riemann riemann.c -lm -fopenmp
 Fecha: viernes 11 de agosto de 2022
-Version: 1.0
+Version: 1.1
 */
 
 // librerias
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "omp.h"
+#include <omp.h> // Agregamos la librería para OpenMP
+
+// Variable global para almacenar el resultado de la integral
+double global_result = 0.0;
 
 // Funciones
 double f1(double x) {
@@ -26,54 +29,52 @@ double f3(double x) {
 
 // Funcion trapecios
 double trapezoides(double a, double b, int n, double (*func)(double)) {
-    double h = (b - a) / n; // Se calcula el ancho de cada trapecio
-    double sum = 0.5 * (func(a) + func(b)); // Se calcula la suma de las alturas de los trapecios
+    double h = (b - a) / n;
+    double sum = 0.5 * (func(a) + func(b));
 
-    // Se calcula la suma de las alturas de los trapecios
     for (int i = 1; i < n; ++i) {
         double x = a + i * h;
         sum += func(x);
     }
 
-    // Se calcula el area total
     return h * sum;
 }
 
-//Funcion principal
+// Funcion principal
 int main(int argc, char* argv[]) {
 
-    // Parametros por defecto
-    double a = 2.0; 
-    double b = 10.0; 
-    int num_threads = 4;
-
-    // Si se ingresan parametros, se toman esos valores
-    if (argc > 3) {
-        a = atof(argv[1]);
-        b = atof(argv[2]);
-        num_threads = atoi(argv[3]); // Se toma la cantidad de hilos del argumento
+    // Verificamos que se haya proporcionado la cantidad correcta de argumentos
+    if (argc != 4) {
+        printf("Uso: %s a b threads\n", argv[0]);
+        return 1;
     }
 
-    // se calcula el ancho de cada trapecio
+    double a = atof(argv[1]);
+    double b = atof(argv[2]);
+    int threads = atoi(argv[3]);
+    
+    int n = 1000000; // Valor por defecto para n 
+
+    // Realizar los cálculos necesarios para distribuir el trabajo entre los threads
     double h = (b - a) / n;
+    int n_local = n / threads;
 
-    double total_sum = 0.0; // inicializa la suma total
-
-    // Se calcula la suma total de las alturas de los trapecios
-    #pragma omp parallel num_threads(num_threads)
+    #pragma omp parallel num_threads(threads)
     {
-        int thread_id = omp_get_thread_num(); // Se obtiene el id del hilo
-        int n_local = n / num_threads; // Se calcula la cantidad de trapecios por hilo
-        double a_local = a + thread_id * n_local * h; // Se calcula el limite inferior de cada hilo
-        double b_local = a_local + n_local * h; // Se calcula el limite superior de cada hilo
+        int thread_id = omp_get_thread_num();
+        double a_local = a + (thread_id * n_local * h);
+        double b_local = a_local + (n_local * h);
 
-        double local_sum = trapezoides(a_local, b_local, n_local, f1);  // Se calcula la suma de las alturas de los trapecios de cada hilo
+        // Cálculo local de la integral usando la función trapezoides
+        double local_result = trapezoides(a_local, b_local, n_local, f1);
 
-        #pragma omp critical // Seccion critica
-        total_sum += local_sum; // Se calcula la suma total de las alturas de los trapecios
+        // Agregar el resultado local a la variable global de manera segura
+        #pragma omp critical
+        global_result += local_result;
     }
 
-    printf("Con n = %d trapezoides, nuestra aproximacion de la integral de %.6lf a %.6lf es %.10lf\n", n, a, b, total_sum);
+    printf("Con n = %d trapezoides, utilizando %d threads, nuestra aproximacion de la integral de %.6lf a %.6lf:\n", n, threads, a, b);
+    printf("Resultado total: %.10lf\n", global_result);
 
     return 0;
-}   
+}

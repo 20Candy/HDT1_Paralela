@@ -44,14 +44,14 @@ int main(int argc, char* argv[]) {
     // Parametros por defecto
     double a = 2.0; 
     double b = 10.0; 
-    int num_threads = 1
+    int num_threads = 4;
+    int n = 1000000; // Valor por defecto para n 
 
     // Si se ingresan parametros, se toman esos valores
     if (argc > 3) {
         a = atof(argv[1]);
         b = atof(argv[2]);
-        n = atoi(argv[3]);
-        num_threads = atoi(argv[4]); // Se toma la cantidad de hilos del argumento
+        num_threads = atoi(argv[3]); 
     }
 
     // se calcula el ancho de cada trapecio
