@@ -45,14 +45,13 @@ int main(int argc, char* argv[]) {
     // Parametros por defecto
     double a = 2.0; 
     double b = 10.0; 
-    int num_threads = 1
+    int num_threads = 4;
 
     // Si se ingresan parametros, se toman esos valores
     if (argc > 3) {
         a = atof(argv[1]);
         b = atof(argv[2]);
-        n = atoi(argv[3]);
-        num_threads = atoi(argv[4]); // Se toma la cantidad de hilos del argumento
+        num_threads = atoi(argv[3]); // Se toma la cantidad de hilos del argumento
     }
 
     // se calcula el ancho de cada trapecio
@@ -77,4 +76,4 @@ int main(int argc, char* argv[]) {
     printf("Con n = %d trapezoides, nuestra aproximacion de la integral de %.6lf a %.6lf es %.10lf\n", n, a, b, total_sum);
 
     return 0;
-}
+}   

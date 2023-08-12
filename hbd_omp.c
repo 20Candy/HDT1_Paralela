@@ -23,9 +23,6 @@ int main(int argc, char* argv[]) {
         age = strtol(argv[1], NULL, 10);
     }
 
-    // Se ejecuta la funcion hello_world con el numero de hilos ingresado
-    int age = strtol(argv[1], NULL, 10);
-
     // Se define el numero de hilos
     #pragma omp parallel
     hello_world(omp_get_thread_num(), omp_get_num_threads(), age);
